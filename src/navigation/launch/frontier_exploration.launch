@@ -1,0 +1,7 @@
+<launch>
+      <node pkg="navigation_pkg" type="frontier_exploration" name="frontier_exploration" output="screen">
+        <param name="use_rosrun" value="true"/>
+        <!-- Please note that we had to execute it with rosrun; otherwise, it does not function correctly. -->
+    </node>
+</launch>
+

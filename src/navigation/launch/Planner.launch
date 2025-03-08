@@ -1,0 +1,9 @@
+<launch>
+      <arg name="planner_method" default="prmstar"/>
+      <node pkg="navigation_pkg" type="Planner" name="Planner" output="screen">
+        <param name="planner_method" value="$(arg planner_method)"/>
+        <param name="use_rosrun" value="true"/>
+        <!-- Please note that we had to execute it with rosrun; otherwise, it does not function correctly. -->
+    </node>
+</launch>
+

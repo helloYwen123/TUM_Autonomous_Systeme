@@ -1,0 +1,23 @@
+# build files
+**/build/
+**/build_isolated/
+**/devel/
+**/devel_isolated/
+**/logs/
+**/.catkin_tools/
+logs/
+.catkin_tools/
+
+# simulation files
+**/Simulation_Data/
+**/Simulation.x86_64
+**/UnityPlayer.so
+
+
+
+# macOS
+.DS_Store
+
+# IDEs
+.vscode
+.idea

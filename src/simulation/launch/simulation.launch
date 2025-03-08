@@ -1,0 +1,73 @@
+<launch>
+  <arg name="load_params" default="true" />
+  <arg name="corrupt_state_estimate" default="true" />
+  <arg name="right_image_topic" default="/realsense/rgb/right_image_raw" />
+  <arg name="right_info_topic" default="/realsense/rgb/right_image_info" />
+  <arg name="left_image_topic" default="/realsense/rgb/left_image_raw" />
+  <arg name="left_info_topic" default="/realsense/rgb/left_image_info" />
+  <arg name="depth_image_topic" default="/realsense/depth/image" />
+  <arg name="depth_info_topic" default="/realsense/depth/camera_info" />
+  <arg name="semantic_image_topic" default="/realsense/semantic/image_raw" />
+  <arg name="semantic_info_topic" default="/realsense/semantic/camera_info" />
+
+  <include file="$(find simulation)/launch/unity_ros.launch" >
+    <arg name="load_params" value="$(arg load_params)" />
+    <arg name="right_image_topic" value="$(arg right_image_topic)" />
+    <arg name="right_info_topic" value="$(arg right_info_topic)" />
+    <arg name="left_image_topic" value="$(arg left_image_topic)" />
+    <arg name="left_info_topic" value="$(arg left_info_topic)" />
+    <arg name="depth_image_topic" value="$(arg depth_image_topic)" />
+    <arg name="depth_info_topic" value="$(arg depth_info_topic)" />
+    <arg name="semantic_image_topic" value="$(arg semantic_image_topic)" />
+    <arg name="semantic_info_topic" value="$(arg semantic_info_topic)" />
+  </include>
+
+  <node name="Simulation" pkg="simulation" type="Simulation.x86_64"/>
+
+  <node pkg="simulation"
+        type="state_estimate_corruptor_node"
+        name="state_estimate_corruptor"
+        output="screen">
+
+    <!-- random-walk drift factor (grows with distance traveled) (sigma / m) -->
+    <param if="$(arg corrupt_state_estimate)" name="drift_rw_factor" value="0.03"/>
+    <param unless="$(arg corrupt_state_estimate)" name="drift_rw_factor" value="0.0"/>
+
+    <!-- independent white noise -->
+    <param if="$(arg corrupt_state_estimate)" name="pos_white_sig" value="0.005"/>
+    <param unless="$(arg corrupt_state_estimate)" name="pos_white_sig" value="0.0"/>
+
+    <!-- average number of seconds between jumps/drift updates -->
+    <param if="$(arg corrupt_state_estimate)" name="jump_seconds" value="20.0"/>
+    <param unless="$(arg corrupt_state_estimate)" name="jump_seconds" value="-1.0"/>
+  </node>
+
+  <node name="w_to_unity" pkg="simulation" type="w_to_unity"/>
+  
+  <node name="controller_node" pkg="controller_pkg" type="controller_node"/>
+  <!--node name="trajectory_publisher_node" pkg="controller_pkg" type="traj_publisher"/-->
+
+
+<!--               TF Publisher                -->
+   <node pkg="tf2_ros" type="static_transform_publisher"
+        name="sim_true_body"      args="0 0 0 0 0 0 /true_body /Quadrotor/TrueState" />
+
+   <node pkg="tf2_ros" type="static_transform_publisher"
+        name="body_to_camera"      args="0.0 0 0 -1.5708 0 -1.5708 /true_body /camera" />
+
+   <node pkg="tf2_ros" type="static_transform_publisher"
+        name="sim_left_camera"      args="0 -0.05 0 0 0 0 /camera Quadrotor/Sensors/RGBCameraLeft" />
+
+  <node pkg="tf2_ros" type="static_transform_publisher"
+        name="sim_right_camera"      args="0 0.05 0 0 0 0 /camera Quadrotor/Sensors/RGBCameraRight" />
+
+  <node pkg="tf2_ros" type="static_transform_publisher"
+        name="camera_to_depth"      args="0 0 0 -1.5708 0 -1.5708 /true_body /Quadrotor/Sensors/DepthCamera" />
+  
+  <node pkg="tf2_ros" type="static_transform_publisher"
+        name="camera_to_semantic"      args="0 0 0 -1.5708 0 -1.5708 /true_body Quadrotor/Sensors/SemanticCamera" />
+
+  <node pkg="tf2_ros" type="static_transform_publisher"
+        name="depth_camera_to_body"      args="0 0 0 0 0 0 /camera /depth_camera" />
+
+</launch>

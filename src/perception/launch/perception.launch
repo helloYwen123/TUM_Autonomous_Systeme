@@ -1,0 +1,40 @@
+<launch>
+
+  <arg name="octomap_params_file" default="$(find perception)/params/octomap_params.yaml"/>
+  <arg name="color_octomap_params_file" default="$(find perception)/params/color_octomap_params.yaml"/>
+  <arg name="color_cloud" default="merged_color_point_cloud"/>
+  <arg name="depth_cloud" default= "/point_cloud"/>
+  <arg name = "simulation_file" default = "mapping.launch"/>
+  
+<!--ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff-->
+
+  <!--RGB color Mapping  Node for OctoMap server in RGB Mapping-->
+  <include file="$(find semantic_slam)/launch/$(arg simulation_file)" />
+  
+   <node pkg="octomap_server" type="octomap_color_server_node" name="octomap_color_server_node">
+      <rosparam file="$(arg color_octomap_params_file)" command="load"/>
+      <remap from="/cloud_in" to="$(arg color_cloud)" /> 
+  </node>  
+
+<!--ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff-->
+
+  <!-- Using depth_image_proc package - Node for OctoMap server in Depth Mapping -->
+  <!-- <node pkg="nodelet" type="nodelet" name="nodelet_manager" args="manager" />
+  <node pkg="nodelet" type="nodelet" name="depth_to_cloud"
+        args="load depth_image_proc/point_cloud_xyz nodelet_manager">
+    <remap from="camera_info" to="/realsense/depth/camera_info"/>
+    <remap from="image_rect" to="/realsense/depth/image"/>
+    <remap from="points" to="/point_cloud"/>
+  </node>
+
+  <node pkg="octomap_server" type="octomap_server_node" name="octomap_server">
+      <rosparam file="$(arg octomap_params_file)" command="load"/>
+      <remap from="/cloud_in" to="$(arg depth_cloud)" /> 
+  </node>   -->
+
+<!--ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff-->
+
+  <!-- Node for perception -->
+  <node pkg="perception" type="light_detection_node" name="LightDetectionNode" output="screen"> </node>
+
+</launch>

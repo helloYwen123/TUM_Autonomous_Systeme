@@ -1,0 +1,11 @@
+<launch>
+        <!--- Trajectory planner -->
+	<node name="waypoint_navigation" pkg="navigation_pkg" type="navigation_pkg" output="screen" />
+
+        
+        <!--- Trajectory sampler -->
+        <node name="sampler" pkg="mav_trajectory_generation_ros" type="trajectory_sampler_node" output="screen">
+            <remap from="path_segments_4D" to="trajectory"/>
+        </node>
+
+</launch>

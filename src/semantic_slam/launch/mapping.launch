@@ -1,0 +1,106 @@
+<launch>
+  <arg name="depth_camera_info"              default="/realsense/depth/camera_info"/>
+  <arg name="depth_image_rect"               default="/realsense/depth/image"/>
+
+  <arg name= "r_rgb_camera_info"               default="/realsense/rgb/right_image_info"/>
+  <arg name= "r_rgb_image_rect"                default="/realsense/rgb/right_image_raw"/>
+  <arg name= "l_rgb_camera_info"               default="/realsense/rgb/left_image_info"/>
+  <arg name= "l_rgb_image_rect"                default="/realsense/rgb/left_image_raw"/>
+  <arg name = "semantic_camera_info"           default="/realsense/semantic/camera_info"/>
+  <!-- <arg name = "semantic_camera_rect"           default="/unity_ros/Quadrotor/Sensors/SemanticCamera/image_raw"/> -->
+
+
+  <arg name="r_depth_registered_camera_info"   default="/r_registered/depth/camera_info"/>
+  <arg name="r_depth_registered_image_rect"    default="/r_registered/depth//image_raw"/>
+  <arg name="l_depth_registered_camera_info"   default="/l_registered/depth/camera_info"/>
+  <arg name="l_depth_registered_image_rect"    default="/l_registered/depth//image_raw"/>
+  <arg name = "semantic_depth_registered_camera_info"  default="/semantic_registered/depth/camera_info"/>
+  <arg name = "semantic_depth_registered_camera_rect"  default="/semantic_registered/depth/image_raw"/>
+
+  <arg name="r_point_cloud"                    default="/r_color_point_cloud"/>
+  <arg name="l_point_cloud"                    default="/l_color_point_cloud"/>
+
+
+  <node pkg="nodelet" type="nodelet" name="nodelet_manager" args="manager" />
+
+  <!--                                  right camera                                   -->
+
+  <node pkg="nodelet" type="nodelet" name="register_depth1" args="load depth_image_proc/register nodelet_manager">
+ 
+
+    <!-- subscribe -->
+    <remap from="rgb/camera_info"    to="$(arg r_rgb_camera_info)"/>
+    <remap from="depth/camera_info"  to="$(arg depth_camera_info)"/>
+    <remap from="depth/image_rect"   to="$(arg depth_image_rect)"/>
+
+    <!-- publish -->
+    <remap from="depth_registered/camera_info"   to="$(arg r_depth_registered_camera_info)"/>
+    <remap from="depth_registered/image_rect"   to="$(arg r_depth_registered_image_rect)"/>
+
+  </node>
+
+  <node pkg="nodelet" type="nodelet" name="register_point_cloud_r" args="load depth_image_proc/point_cloud_xyzrgb nodelet_manager">
+    
+    <!-- subscribe -->
+    <remap from="rgb/camera_info"             to="$(arg r_rgb_camera_info)"/>
+    <remap from="rgb/image_rect_color"        to="$(arg r_rgb_image_rect)"/>
+    <remap from="depth_registered/image_rect" to="$(arg r_depth_registered_image_rect)"/>
+
+    <!-- publish -->
+    <remap from="depth_registered/points"   to="$(arg r_point_cloud)"/>
+
+  </node>
+
+
+<!--                                                    left camera                                           -->
+
+  <node pkg="nodelet" type="nodelet" name="register_depth2" args="load depth_image_proc/register nodelet_manager">
+
+    <!-- subscribe -->
+    <remap from="rgb/camera_info"    to="$(arg l_rgb_camera_info)"/>
+    <remap from="depth/camera_info"  to="$(arg depth_camera_info)"/>
+    <remap from="depth/image_rect"   to="$(arg depth_image_rect)"/>
+
+     <!-- publish -->
+    <remap from="depth_registered/camera_info"   to="$(arg l_depth_registered_camera_info)"/>
+    <remap from="depth_registered/image_rect"   to="$(arg l_depth_registered_image_rect)"/>
+
+  </node>
+
+  <node pkg="nodelet" type="nodelet" name="register_point_cloud_l" args="load depth_image_proc/point_cloud_xyzrgb nodelet_manager">
+    
+    <!-- subscribe -->
+    <remap from="rgb/camera_info"             to="$(arg l_rgb_camera_info)"/>
+    <remap from="rgb/image_rect_color"        to="$(arg l_rgb_image_rect)"/>
+    <remap from="depth_registered/image_rect" to="$(arg l_depth_registered_image_rect)"/>
+
+    <!-- publish -->
+    <remap from="depth_registered/points"   to="$(arg l_point_cloud)"/>
+
+  </node>
+
+
+
+   <!--                         semantic camera                              -->
+
+  <node pkg="nodelet" type="nodelet" name="register_depth_semantic" args="load depth_image_proc/register nodelet_manager">
+    
+    <!-- subscribe -->
+    <remap from="rgb/camera_info"    to="$(arg semantic_camera_info)"/>
+    <remap from="depth/camera_info"  to="$(arg depth_camera_info)"/>
+    <remap from="depth/image_rect"   to="$(arg depth_image_rect)"/>
+
+    <!-- publish -->
+    <remap from="depth_registered/camera_info"   to="$(arg semantic_depth_registered_camera_info)"/>
+    <remap from="depth_registered/image_rect"   to="$(arg semantic_depth_registered_camera_rect)"/>
+
+  </node>
+
+  <node pkg="semantic_cloud" type="AS_semantic_cloud.py" name="semantic_cloud"/>
+
+<!--  merge point cloud -->
+
+  <node pkg="merge_point_cloud" type="merge_point_cloud_node" name="merge_point_clouds" output="screen"/>
+
+
+</launch>

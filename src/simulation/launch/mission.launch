@@ -1,0 +1,22 @@
+<launch>
+    <!-- Start the simulation environment -->
+    <include file="$(find simulation)/launch/simulation.launch" />
+
+    <!-- Start the perception package -->
+    <include file="$(find perception)/launch/perception.launch" />
+
+    <!-- Start the state machine -->
+    <include file="$(find state_machine_pkg)/launch/state_machine.launch" />
+
+    <!-- Start Planner with planner_method set to "prmstar" -->
+    <include file="$(find navigation_pkg)/launch/Planner.launch">
+        <arg name="planner_method" value="prmstar"/>
+    </include>
+
+    <!-- Start frontier exploration -->
+    <include file="$(find navigation_pkg)/launch/frontier_exploration.launch" />
+
+    <!-- Launch RViz with a custom configuration -->
+    <node name="rviz" pkg="rviz" type="rviz" 
+          args="-d $(find simulation)/launch/rviz_configuration.rviz" />
+</launch>
