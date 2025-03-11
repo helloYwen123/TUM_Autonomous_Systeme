@@ -18,7 +18,7 @@ This repository is built upon part of the code in course "Autonome Systeme" (LRG
 
 Being in the main folder of your catkin workspace:
 ```shell
-git clone https://gitlab.lrz.de/tum24_as_09_group/as.git
+git clone https://github.com/helloYwen123/TUM_Autonomous_Systems.git
 ```
 Download the unity environment `AutonomousSystem.zip` from [here](https://drive.google.com/file/d/1HQ6VXeGtA4XMW2ph0_ETmt2H92DOaxsN/view?usp=sharing) and extract into `src/simulation`.
 
